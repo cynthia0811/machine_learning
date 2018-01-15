@@ -46,7 +46,7 @@ def main():
 
     # sklearn.datasets支持从目录读取所有分类好的文本。
     # 不过目录必须按照一个文件夹一个标签名的规则放好。比如本文使用的数据集共有2个标签，一个为“net”，一个为“pos”
-    movie_reviews = load_files('data\endata')
+    movie_reviews = load_files('./data/endata')
     print(movie_reviews.data)
     print(movie_reviews.target)
     doc_train, doc_test, y_train, y_test = train_test_split(

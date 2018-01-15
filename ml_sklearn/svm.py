@@ -14,7 +14,7 @@ def main():
 
     data = []
     labels = []
-    with open("data\\tree.txt") as ifile:
+    with open("./data/tree.txt") as ifile:
         for line in ifile:
             tokens = line.strip().split(' ')
             data.append([float(tk) for tk in tokens[:-1]])

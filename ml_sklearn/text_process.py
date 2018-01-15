@@ -110,12 +110,7 @@ def text_vector():
         print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
 
 
-
-def main():
-    pass
-
 if __name__ == '__main__':
-    # main()
 
     # get_data()
 

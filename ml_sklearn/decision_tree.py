@@ -15,7 +15,7 @@ def main():
     """
     data = []
     labels = []
-    with open("data/tree.txt") as ifile:
+    with open("./data/tree.txt") as ifile:
         for line in ifile:
             # strip() 方法用于移除字符串头尾指定的字符（默认为空格）。
             tokens = line.strip().split(" ")
@@ -73,8 +73,7 @@ def main():
 
     print(classification_report(y, answer, target_names=['thin', 'fat']))
 
-    curr_path = os.getcwd()
-    model_path = curr_path + "\models\clf_dsccision.model"
+    model_path = "./models/clf_dsccision.model"
     # 保存模型
     joblib.dump(clf, model_path, compress=0)
     # ＃加载模型

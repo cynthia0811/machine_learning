@@ -16,12 +16,12 @@ def main():
     朴素贝叶斯实现
     """
     # 加载数据
-    movies_reviews = load_files("data/tokens")
-    sp.save('data/movie_data.npy', movies_reviews.data)
-    sp.save('data/movie_target.npy', movies_reviews.target)
+    movies_reviews = load_files("./data/tokens")
+    sp.save('./data/movie_data.npy', movies_reviews.data)
+    sp.save('./data/movie_target.npy', movies_reviews.target)
 
-    movie_data = sp.load('data/movie_data.npy')
-    movie_target = sp.load('data/movie_target.npy')
+    movie_data = sp.load('./data/movie_data.npy')
+    movie_target = sp.load('./data/movie_target.npy')
     x = movie_data
     y = movie_target
 
@@ -52,8 +52,7 @@ def main():
     # 特征名称
     # print(count_vec.get_feature_names())
     # 保存模型
-    curr_path = os.getcwd()
-    model_path = curr_path + "\models\clf_bayes.model"
+    model_path =  "./models/clf_bayes.model"
     joblib.dump(clf, model_path, compress=0)
 
 
