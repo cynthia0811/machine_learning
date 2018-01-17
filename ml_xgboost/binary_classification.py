@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+
 # xgboost二分类
 import numpy as np
 from xgboost import XGBClassifier
@@ -7,13 +8,11 @@ from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKF
 from sklearn.metrics import accuracy_score
 from matplotlib import pyplot
 
-seed = 7
-np.random.seed(seed)
+np.random.seed(19260817)
 
 
 def main():
-    dataset = np.loadtxt(
-        './ml_xgboost/data/pima-indians-diabetes.csv', delimiter=',')
+    dataset = np.loadtxt('./data/pima-indians-diabetes.data', delimiter=',')
     # print(dataset)
     x = dataset[:, 0:8]
     y = dataset[:, 8]
@@ -37,7 +36,8 @@ def main():
     learning_rate = [0.0001, 0.001, 0.01, 0.1, 0.2, 0.3]
     param_grid = dict(learning_rate=learning_rate)
     skfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=seed)
-    grid_search = GridSearchCV(model, param_grid, scoring='neg_log_loss', n_jobs=1, cv=skfold)
+    # 网格搜索
+    grid_search = GridSearchCV( model, param_grid, scoring='neg_log_loss', n_jobs=1, cv=skfold)
     grid_result = grid_search.fit(x, y)
 
     print("best_score: %f best_params %s" % (grid_result.best_score_, grid_result.best_params_))
