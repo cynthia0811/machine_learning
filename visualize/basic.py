@@ -134,6 +134,19 @@ def d3():
     plt.show()
 
 
+def dynamic():
+    """
+    动态图
+    """
+    fig,ax=plt.subplots()
+    y1=[]
+    for i in range(50):
+        y1.append(i)
+        ax.cla()
+        ax.bar(y1,label='test',height=y1,width=0.3)
+        ax.legend()
+        plt.pause(0.3)
+
 if __name__ == '__main__':
     # d2()
 
