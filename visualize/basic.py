@@ -145,11 +145,13 @@ def dynamic():
         ax.cla()
         ax.bar(y1,label='test',height=y1,width=0.3)
         ax.legend()
-        plt.pause(0.3)
+        plt.pause(0.2)
 
 if __name__ == '__main__':
     # d2()
 
     # histogram()
 
-    d3()
+    # d3()
+
+    # dynamic()
