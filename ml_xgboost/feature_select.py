@@ -7,6 +7,7 @@ from sklearn import preprocessing
 from sklearn.feature_selection import RFE
 from sklearn.svm import SVR
 from sklearn.preprocessing import Imputer
+from sklearn.ensemble import RandomForestRegressor
 
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
 plt.rcParams['axes.unicode_minus'] = False  # 解决保存图像是负号'-'显示为方块的问题
@@ -119,6 +120,33 @@ def feature_ref():
         if v:
             print(data_col[i])
 
+def train():
+
+    PATH = "./data/house/"
+    df_train = pd.read_csv(f'{PATH}train.csv', index_col='Id')
+    df_test = pd.read_csv(f'{PATH}test.csv', index_col='Id')
+    target = df_train['SalePrice']
+    df_train = df_train.drop('SalePrice', axis=1)
+    df_train['training_set'] = True
+    df_test['training_set'] = False
+    df_full = pd.concat([df_train, df_test])
+    df_full = df_full.interpolate()
+    df_full = pd.get_dummies(df_full)
+    df_train = df_full[df_full['training_set'] == True]
+    df_train = df_train.drop('training_set', axis=1)
+    df_test = df_full[df_full['training_set'] == False]
+    df_test = df_test.drop('training_set', axis=1)
+
+
+    rf = RandomForestRegressor(n_estimators=100, n_jobs=-1)
+    rf.fit(df_train, target)
+    preds = rf.predict(df_test)
+    my_submission = pd.DataFrame({'Id': df_test.index, 'SalePrice': preds})
+    my_submission.to_csv(f'{PATH}submission.csv', index=False)
+
+    # rmse = np.sqrt(np.mean((preds - y_test)**2))
+    # print("rms:", rmse)
+
 
 if __name__ == '__main__':
     
@@ -126,6 +154,8 @@ if __name__ == '__main__':
 
     # feature_ref()
 
-    feature_selection()
+    # feature_selection()
+
+    train()
 
 
