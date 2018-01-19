@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import Imputer,LabelEncoder
 from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
 
 
 def data_preprocessing():
@@ -92,7 +93,6 @@ def train_logreistic():
     """
     逻辑回归
     """
-
     X_train, X_test, y_train, y_test = load_data()
 
     model = LogisticRegression(penalty='l2')
@@ -101,9 +101,39 @@ def train_logreistic():
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
 
-    print("LogisticRegression：{0},RMS:{1},存活：{3}".format(rfc_rate, rmse, total))
+    print("LogisticRegression acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format( rfc_rate, rmse, total))
+    return rfc_rate, rmse, total
 
 
+def train_randomForster():
+
+    X_train, X_test, y_train, y_test = load_data()
+    model = RandomForestClassifier(n_estimators=300,max_depth=12,random_state=7)
+    model.fit(X_train,y_train)
+    y_pred = model.predict(X_test)
+    rfc_rate, rmse = calc_accuracy(y_pred, y_test)
+    total = total_survival(y_pred)
+    # RandomForestClassifier acc_rate：82.6816,RMS:0.4162,存活：54
+    print("RandomForestClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rfc_rate, rmse, total))
+    return rfc_rate, rmse, total
+
+
+def train_XGBoost():
+
+    X_train, X_test, y_train, y_test = load_data()
+    model = xgb.XGBClassifier(max_delta_step=6, learning_rate=0.1, n_estimators=100, objective="binary:logistic",
+                              silent=True)
+    eval_data = [(X_test, y_test)]
+    model.fit(X_train, y_train, eval_set=eval_data, early_stopping_rounds=30)
+    y_pred = model.predict(X_test)
+    rfc_rate, rmse = calc_accuracy(y_pred, y_test)
+    total = total_survival(y_pred)
+
+    return rfc_rate, rmse, total
+    
+    # XGBClassifier acc_rate：80.4469,RMS:0.4422,存活：56
+
+    print("XGBClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rfc_rate, rmse, total))
 
 def calc_accuracy(y_pred, y_true):
     """
@@ -128,10 +158,33 @@ def total_survival(y_pred):
     return total
 
 
+def train():
+    
+    lg_rate, lg_rmse, lg_total = train_logreistic()
+    rf_rate, rf_rmse, rf_total = train_randomForster()
+    xg_rate, xg_rmse, xg_total = train_XGBoost()
+
+    print("LogisticRegression acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format( lg_rate, lg_rmse, lg_total))
+    print("RandomForestClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rf_rate, rf_rmse, rf_total))
+    print("XGBClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(xg_rate, xg_rmse, xg_total))
+
+    size = 3
+    total_width, n = 0.8, 3
+    width = total_width / n
+    x = np.arange(size)
+    x = x - (total_width - width) / 2
+    a = [lg_rate, rf_rate, xg_rate]
+    b = [lg_rmse, rf_rmse, xg_rmse]
+    c = [lg_total, rf_total, xg_total]
+    plt.bar(x, a,  width=width, label='a')
+    plt.bar(x + width, b, width=width, label='b')
+    plt.bar(x + 2 * width, c, width=width, label='c')
+    plt.legend()
+    plt.show()
 
 if __name__ == '__main__':
     
     # data_preprocessing()
     # load_data()
 
-    train_logreistic()
+    train()
