@@ -57,16 +57,21 @@ def main():
     # error_rate = np.sum(pred_label != test_y) / test_y.shape[0]
     # print('Test error using softprob = {}'.format(error_rate))
 
+    # n_estimators 随机森林中树的数量  
+    # colsample_bytree：训练每棵树时用来训练的特征的比例，
+    # subsample：训练每棵树时用来训练的数据占全部的比例。用于防止 Overfitting。
     model = XGBClassifier(max_depth=6, learning_rate=0.1, n_estimators=100, silent=True, objective="multi:softmax",
                           nthread=4, gamma=0, min_child_weight=1, max_delta_step=0, subsample=1, colsample_bytree=1, colsample_bylevel=1,
                           reg_alpha=0, reg_lambda=1, scale_pos_weight=1, base_score=0.5, seed=7, missing=None)
     eval_set = [(test_X, test_y)]
-
+    # early_stopping_rounds：用于控制在 Out Of Sample 的验证集上连续多少个迭代的分数都没有提高后就提前终止训练。用于防止 Overfitting。
     # mlogloss :“mlogloss”: 多分类用  “merror”: Multiclass classification error rate.
-    model.fit(train_X,train_y,eval_set=eval_set,eval_metric=['mlogloss','merror'],early_stopping_rounds=30,verbose=True)
-
+    bst=model.fit(train_X,train_y,eval_set=eval_set,eval_metric=['mlogloss','merror'],early_stopping_rounds=30,verbose=True)
+    y_pred = bst.predict(test_X)
+    error_rate = np.sum(y_pred != test_y) / test_y.shape[0]
+    print('Test error using softmax = {}'.format(error_rate))
 
 if __name__ == '__main__':
-    # main()
+    main()
 
  

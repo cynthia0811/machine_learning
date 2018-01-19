@@ -25,7 +25,7 @@ def check_nan():
     na_data.head(20)
     print(na_data)
 
-    # 删除缺失值比较多的特征  删除了确实值超过20%的特征
+    # 删除缺失值比较多的特征  删除了缺失值超过20%的特征
     train = train.drop(na_data[na_data['rate'] > 0.20].index, axis=1)
     d_count = train.isnull().sum().sort_values(ascending=False)
     print(d_count)
@@ -106,7 +106,6 @@ def feature_ref():
     x, y = load_data()
 
     data_col=x.columns
-    print("1:",np.isnan(x).any())
     # 缺失值补全
     imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
     imp.fit(x)
