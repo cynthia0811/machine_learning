@@ -21,6 +21,7 @@ def data_preprocessing():
     pd_test = pd.read_csv('./data/titanic/test.csv')
     pd_gender = pd.read_csv('./data/titanic/gender_submission.csv')
     print(pd_train.shape, pd_test.shape)
+    print(pd_train.head(10))
     
     # test和gender 合并
     pd_test = pd.merge(pd_test, pd_gender, on='PassengerId')
@@ -128,13 +129,12 @@ def train_XGBoost():
     y_pred = model.predict(X_test)
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
-
+    
+    print("XGBClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rfc_rate, rmse, total))
+    # XGBClassifier acc_rate：80.4469,RMS:0.4422,存活：56
     return rfc_rate, rmse, total
     
-    # XGBClassifier acc_rate：80.4469,RMS:0.4422,存活：56
-
-    print("XGBClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rfc_rate, rmse, total))
-
+    
 def calc_accuracy(y_pred, y_true):
     """
     计算精度
