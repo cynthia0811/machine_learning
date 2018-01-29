@@ -1,12 +1,12 @@
 # -*- coding:utf-8 -*-
 import numpy as np
 import pandas as pd
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor,plot_importance
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import Imputer, LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-
+import matplotlib.pyplot as plt
 
 def main():
     data = pd.read_csv('./data/house/train.csv')
@@ -32,7 +32,7 @@ def main():
     data = imputer.transform(data)
 
     data = pd.DataFrame(data=data, columns=columns)
-
+    print(data.columns)
     y = data['SalePrice']
     # select_dtypes(include=None, exclude=None)[source] include：包含某些列，exclude：排除某些列
     # X = data.drop(['SalePrice'], axis=1).select_dtypes(exclude=['object'])
@@ -41,8 +41,11 @@ def main():
 
     model = XGBRegressor(max_depth=8, n_estimators=1000, learning_rate=0.01, objective="reg:linear",
                          colsample_bylevel=.8, colsample_bytree=.8, nthread=2, seed=1024)
-    model.fit(train_X, train_y, eval_set=[
-              (test_X, test_y)], early_stopping_rounds=30, verbose=False)
+    model.fit(train_X, train_y, eval_set=[(test_X, test_y)], early_stopping_rounds=30, verbose=False)
+
+    # 显示重要特征
+    plot_importance(model)
+    plt.show()
 
     predictions = model.predict(test_X)
     print("XGBoost Root Mean Squared Error : ", (np.sqrt(mean_absolute_error(predictions, test_y))))

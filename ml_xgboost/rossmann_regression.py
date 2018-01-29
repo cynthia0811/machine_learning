@@ -170,7 +170,7 @@ def feature_selection():
 
     # use_buffer：数据加载的缓冲大小。
     # num_round：运行的次数。
-    
+
     params = {
         # 节点的最少特征数 这个参数用于避免过拟合。当它的值较大时，可以避免模型学习到局部的特殊样本。 但是如果这个值过高，会导致欠拟合。这个参数需要使用CV来调整。
         'min_child_weight': 60,
@@ -187,7 +187,6 @@ def feature_selection():
     }
 
     xgtrain = xgb.DMatrix(X_train, label=y_train)
-
 
     # params (dict)：参数。
     # dtrain (DMatrix)：给XGB训练用的数据。
@@ -240,7 +239,7 @@ def transform_data(train):
 
 
 def create_feature_map(features):
-    outfile = open('./data/house/xgb.fmap', 'w')
+    outfile = open('./data/rossmann/xgb.fmap', 'w')
     i = 0
     for feat in features:
         outfile.write('{0}\t{1}\tq\n'.format(i, feat))
@@ -259,16 +258,20 @@ def train():
                              nthread=4, silent=True, subsample=0.8, colsample_bytree=0.8)
     bst = model.fit(X_train, y_train, eval_set=eval_set, early_stopping_rounds=30, verbose=True)
 
-    preds = bst.predict(X_test)
-    rmse = np.sqrt(np.mean((preds - y_test)**2))
-    print("rms:", rmse)
+    # 显示重要特征
+    xgb.plot_importance(model)
+    plt.show()
+
+    # preds = bst.predict(X_test)
+    # rmse = np.sqrt(np.mean((preds - y_test)**2))
+    # print("rms:", rmse)
 
 
 if __name__ == '__main__':
     # main()
     # pre_train()
     # pre_store()
-    # feature_selection()
+    feature_selection()
     # load_data()
 
-    train()
+    # train()
