@@ -125,6 +125,52 @@ def feature_selection():
 
     print("load.......")
     print(X_train.columns)
+
+    # booster：提升器# 有三种选择gbtree、dart、gblinear前两种为树模型，最后一个是线性模型。
+    # silent：无记录# 为0代表会输出运行的信息，1代表不输出。
+    # nthread：并行数目。# 提高速度的。
+    # num_pbuffer：程序自动设置，缓冲的大小。记录上一轮预测的结果。# 这是由程序自动设置的，用户无须管。
+    # num_feature：程序自动设置，特征维度的大小。# 这是由程序自动设置的，用户无须管。
+
+    # eta：学习率。
+    # gamma：最小损失分裂。 #如果比较小，那么叶子节点就会不断分割，越具体细致。如果比较大，那么算法就越保守。
+    # max_depth：最大树的深度。# 数值越大，模型越复杂、越具体，越有可能过拟合过。
+    # min_child_weight：子节点最小的权重。# 重要参数。如果叶子节点切分低于这个阈值，就会停止往下切分的了。该参数数值越大，就越保守，越不会过拟合。与gamma有相关性，但是gamma关注损失，而这关心自身权重。
+    # max_delta_step：最大delta的步数# 数值越大，越保守。一般这个参数是不需要的，但它能帮助语料极度不平衡的逻辑回归模型。
+    # subsample：子样本数目 # 是否只使用部分的样本进行训练，这可以避免过拟合化。默认为1，即全部用作训练。
+    # colsample_bytree：每棵树的列数（特征数）。# 默认为1
+    # colsample_bylevel：每一层的列数（特征数）。#默认为1
+    # lambda：L2正则化的权重。# 增加该数值，模型更加保守。
+    # alpha ：L1正则化的权重。# 增加该数值，模型更加保守。
+    # tree_method：树构造的算法。# 默认auto，使用启发式选择最快的一种。如果是中小型数据，就用exact 准确算法，大型数据就选择approx 近似算法。
+    # sketch_eps：# 只用在approx 算法的，用户一般不用调。调小可以获得更准确的序列。
+    # scale_pos_weight：用在不均衡的分类。# 默认为1，还有一种经典的取值是： sum(negative cases) / sum(positive cases)
+    # updater：更新器。# 如果更新树，是一个高级参数。程序会自动选择。当然用户也能自己选择。只是有很多种选择，我看不懂具体的。
+    # refresh_leaf：# 当updater= refresh才有用。设置为False时，叶子节点不更新，只更新中间节点。
+    # process_type：程序运行方式。# 两种选择，默认是default，新建一些树。而选择update，代表基于已有的树，并对已有的树进行更新。
+
+    # 飞镖提升器的参数 Dart Booster
+    #     sample_type：选样方式。# 两种选择。uniform 代表一样的树进行舍弃，weighted 代表选择权重比例的树进行舍弃。
+    #     normalize_type：正则化方式。# 两种选择。tree、forest，区别在于计算新树的权重、舍弃树的计算，两种公式不同。
+    #     rate_drop：舍弃的比例。# 舍弃上一轮树的比例。
+    #     one_drop：# 当值不为0的时候，至少有一棵树被舍弃。
+    #     skip_drop：有多少的概率跳过舍弃树的程序。
+
+    # 线性提升器的参数 Linear Booster（只有3个）
+    #     lambda：L2正则化的权重。# 增加该数值，模型更加保守。
+    #     alpha ：L1正则化的权重。# 增加该数值，模型更加保守。
+    #     lambda_bias：L2正则化的偏爱。# 不知道数值大小的影响作用。
+
+    # 任务参数
+
+    #     objective：reg:linear线性回归、reg:logistic逻辑回归、binary:logistic逻辑回归处理二分类（输出概率）、binary:logitraw逻辑回归处理二分类（输出分数）、count:poisson泊松回归处理计算数据（输出均值、max_delta_step参数默认为0.7）、multi:softmax多分类（需要设定类别的个数num_class）、multi:softprob多分类（与左侧的一样，只是它的输出是ndata*nclass，也就是输出输入各类的概率）、rank:pairwise处理排位问题、reg:gamma用γ回归（返回均值）、reg:tweedie用特威迪回归。
+    #     base_score：初始化时，会预测各种类别的分数。# 当迭代足够多的次数，改变这个值是没有什么用的。
+    #     eval_metric：评估分数的机制。# 用户可以加新评估机制进来的。主要的：rmse针对回归问题、error针对分类问题、map（Mean average precision）针对排位问题。
+    #     seed：种子。# 默认为0。随机数的意思。
+
+    # use_buffer：数据加载的缓冲大小。
+    # num_round：运行的次数。
+    
     params = {
         # 节点的最少特征数 这个参数用于避免过拟合。当它的值较大时，可以避免模型学习到局部的特殊样本。 但是如果这个值过高，会导致欠拟合。这个参数需要使用CV来调整。
         'min_child_weight': 60,
@@ -141,6 +187,22 @@ def feature_selection():
     }
 
     xgtrain = xgb.DMatrix(X_train, label=y_train)
+
+
+    # params (dict)：参数。
+    # dtrain (DMatrix)：给XGB训练用的数据。
+    # num_boost_round (int)：运行多少次迭代。
+    # evals (list of pairs (DMatrix, string))：这是由pari元素组成的list，可显示性能出来的验证集。
+    # obj (function)：自定制的目标函数。
+    # feval (function)：自定制的评估函数。
+    # maximize (bool)：是否要验证集得分最大。
+    # early_stopping_rounds (int)：可在一定的迭代次数内准确率没有提升（evals列表的全部验证集都没有提升）就停止训练。# 使用 bst.best_ntree_limit 可以得到真实的分数。
+    # evals_result (dict)：通过字典找特定验证集evals 分数。# 例如验证集evals = [(dtest,’eval’), (dtrain,’train’)]，并且在params中设定，{‘eval_metric’: ‘logloss’}。就可根据str找分数 {‘train’: {‘logloss’: [‘0.48253’, ‘0.35953’]}, ‘eval’: {‘logloss’: [‘0.480385’, ‘0.357756’]}}
+    # verbose_eval (bool or int)：是否显示每次迭代的情况。# 如果设置为True就代表每次都显示，False都不显示，一个正整数（如4）就代表每4轮输出一次。
+    # learning_rates (list or function (弃用 - use callback API instead))# 如果是一个list，就代表每一轮的学习率是多少。此外params中也有一个学习率eta，但是eta只能是一个浮点数，不够这个具体。
+    # xgb_model (file name of stored xgb model or ‘Booster’ instance)：通过名字加载已有的XGB模型。
+    # callbacks (list of callback functions)：在每次迭代后的处理。是一个list类型。# 可以预设定参数（暂时不会用） [xgb.callback.reset_learning_rate(custom_rates)]
+
     bst = xgb.train(params, xgtrain, num_boost_round=10)
     # 特征
     features = [x for x in X_train.columns if x not in ['Sales', 'Store']]
