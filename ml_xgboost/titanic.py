@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import Imputer,LabelEncoder
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import GridSearchCV  
 import matplotlib.pyplot as plt
 
 
@@ -116,19 +117,41 @@ def train_randomForster():
 
 
 def train_XGBoost():
-
     X_train, X_test, y_train, y_test = load_data()
-    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
-                              silent=False,subsample=1)
+
+    model = xgb.XGBClassifier(max_depth=7, learning_rate=0.01, n_estimators=1000, objective="binary:logistic",
+                              silent=True,min_child_weight=8)
+
     eval_data = [(X_test, y_test)]
     model.fit(X_train, y_train, eval_set=eval_data, early_stopping_rounds=30)
+
     y_pred = model.predict(X_test)
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
     
     # XGBClassifier acc_rate：80.4469,RMS:0.4422,存活：56
     return rfc_rate, rmse, total
-    
+
+
+ 
+def train_CV_XGBoost():
+    X_train, X_test, y_train, y_test = load_data()
+
+    params = {
+        'max_depth': [4, 5, 6, 7, 8],
+        'min_child_weight': [4, 5, 6, 7, 8],
+        'learning_rate': [0.01, 0.03, 0.06, 0.08, 0.1]
+    }
+    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
+                              min_child_weight=5)
+    gcv = GridSearchCV(estimator=model, param_grid=params, scoring='roc_auc', n_jobs=4, iid=False, cv=5,verbose=1)
+
+    gcv.fit(X_train, y_train)
+
+    print(gcv.grid_scores_)
+    print(gcv.best_params_)
+    print(gcv.best_score_)
+
     
 def calc_accuracy(y_pred, y_true):
     """
@@ -179,7 +202,10 @@ def train():
 
 if __name__ == '__main__':
     
-    data_preprocessing()
+    # data_preprocessing()
     # load_data()
 
     train()
+
+    # train_CV_XGBoost()
+
