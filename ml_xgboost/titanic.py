@@ -119,8 +119,8 @@ def train_randomForster():
 def train_XGBoost():
     X_train, X_test, y_train, y_test = load_data()
 
-    model = xgb.XGBClassifier(max_depth=7, learning_rate=0.01, n_estimators=1000, objective="binary:logistic",
-                              silent=True,min_child_weight=8)
+    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
+                              silent=True,min_child_weight=6)
 
     eval_data = [(X_test, y_test)]
     model.fit(X_train, y_train, eval_set=eval_data, early_stopping_rounds=30)
@@ -143,7 +143,7 @@ def train_CV_XGBoost():
         'learning_rate': [0.01, 0.03, 0.06, 0.08, 0.1]
     }
     model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
-                              min_child_weight=5)
+                              min_child_weight=6)
     gcv = GridSearchCV(estimator=model, param_grid=params, scoring='roc_auc', n_jobs=4, iid=False, cv=5,verbose=1)
 
     gcv.fit(X_train, y_train)
