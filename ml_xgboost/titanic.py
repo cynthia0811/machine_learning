@@ -21,16 +21,20 @@ def data_preprocessing():
     pd_test = pd.read_csv('./data/titanic/test.csv')
     pd_gender = pd.read_csv('./data/titanic/gender_submission.csv')
     print(pd_train.shape, pd_test.shape)
-    print(pd_train.head(10))
-    
-    # test和gender 合并
-    pd_test = pd.merge(pd_test, pd_gender, on='PassengerId')
-    print(pd_train.shape, pd_test.shape)
 
+    sex_count = pd_train.groupby(['Sex', 'Survived'])['Survived'].count()
+    print(sex_count)
+    
     # 性别 将性别字段Sex中的值 female用0，male用1代替,类型 int
     pd_train['Sex'] = pd_train['Sex'].map({'female': 0, 'male': 1}).astype(int)
-    pd_test['Sex'] = pd_test['Sex'].map({'female': 0, 'male': 1}).astype(int)
     # print(pd_test.columns)
+    embark_dummies  = pd.get_dummies(pd_train['Embarked'])
+    pd_train = pd_train.join(embark_dummies)
+    pd_train.drop(['Embarked','PassengerId'], axis=1,inplace=True)
+
+    pd_train['Fare_Category'] = pd_train['Fare'].map(fare_category)
+
+    columns=pd_train.columns
 
     # 将类型变量转换位连续变量
     for f in pd_train.columns:
@@ -39,13 +43,8 @@ def data_preprocessing():
             label.fit(list(pd_train[f].values))
             pd_train[f] = label.transform(list(pd_train[f].values))
 
-    for f in pd_test.columns:
-        if pd_test[f].dtype == 'object':
-            label = LabelEncoder()
-            label.fit(list(pd_test[f].values))
-            pd_test[f] = label.transform(list(pd_test[f].values))
-
     # 统计缺失的列
+    print("统计缺失的列")
     na_train = pd_train.isnull().sum().sort_values(ascending=False)
     print(na_train)
 
@@ -55,23 +54,10 @@ def data_preprocessing():
     imput = imput.fit(train_data)
     train_data = imput.fit_transform(train_data)
 
-    # 使用均值填充缺失值
-    test_data= pd_test.values
-    imput = Imputer(missing_values="NaN", strategy="mean", axis=0)
-    imput = imput.fit(test_data)
-    test_data = imput.fit_transform(test_data)
-
-    pd_train = pd.DataFrame(train_data, index=None, columns=['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp',
-                                                             'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'])
-
-    pd_test = pd.DataFrame(train_data, index=None, columns=['PassengerId', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp',
-                                                            'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked', 'Survived'])
-                                                           
+    pd_train = pd.DataFrame(train_data, index=None, columns=columns)
     na_train = pd_train.isnull().sum().sort_values(ascending=False)
-    na_test = pd_test.isnull().sum().sort_values(ascending=False)
-    print("缺失值处理后：")
-    print(na_train)
-    print(na_test)
+    # print("缺失值处理后：")
+    # print(na_train)
     # print(pd_train.head())
 
     # 保存新数据
@@ -79,11 +65,23 @@ def data_preprocessing():
     pd_train.to_csv('./data/titanic/new_test.csv')
 
 
+def fare_category(fare):
+        if fare <= 4:
+            return 0
+        elif fare <= 10:
+            return 1
+        elif fare <= 30:
+            return 2
+        elif fare <= 45:
+            return 3
+        else:
+            return 4
+
 def load_data():
     train_data = pd.read_csv('./data/titanic/new_train.csv')
     test_data = pd.read_csv('./data/titanic/new_test.csv')
 
-    X = train_data.drop(['Survived', 'PassengerId'], 1)
+    X = train_data.drop(['Survived'], 1)
     y = train_data['Survived']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=7)
 
@@ -102,35 +100,32 @@ def train_logreistic():
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
 
-    print("LogisticRegression acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format( rfc_rate, rmse, total))
     return rfc_rate, rmse, total
 
 
 def train_randomForster():
 
     X_train, X_test, y_train, y_test = load_data()
-    model = RandomForestClassifier(n_estimators=300,max_depth=12,random_state=7)
+    model = RandomForestClassifier(n_estimators=500,max_depth=6,random_state=7)
     model.fit(X_train,y_train)
     y_pred = model.predict(X_test)
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
     # RandomForestClassifier acc_rate：82.6816,RMS:0.4162,存活：54
-    print("RandomForestClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rfc_rate, rmse, total))
     return rfc_rate, rmse, total
 
 
 def train_XGBoost():
 
     X_train, X_test, y_train, y_test = load_data()
-    model = xgb.XGBClassifier(max_delta_step=6, learning_rate=0.1, n_estimators=100, objective="binary:logistic",
-                              silent=True)
+    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
+                              silent=False,subsample=1)
     eval_data = [(X_test, y_test)]
     model.fit(X_train, y_train, eval_set=eval_data, early_stopping_rounds=30)
     y_pred = model.predict(X_test)
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
     
-    print("XGBClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rfc_rate, rmse, total))
     # XGBClassifier acc_rate：80.4469,RMS:0.4422,存活：56
     return rfc_rate, rmse, total
     
@@ -168,23 +163,23 @@ def train():
     print("RandomForestClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(rf_rate, rf_rmse, rf_total))
     print("XGBClassifier acc_rate：{0:.4f},RMS:{1:.4f},存活：{2}".format(xg_rate, xg_rmse, xg_total))
 
-    size = 3
-    total_width, n = 0.8, 3
-    width = total_width / n
-    x = np.arange(size)
-    x = x - (total_width - width) / 2
-    a = [lg_rate, rf_rate, xg_rate]
-    b = [lg_rmse, rf_rmse, xg_rmse]
-    c = [lg_total, rf_total, xg_total]
-    plt.bar(x, a,  width=width, label='a')
-    plt.bar(x + width, b, width=width, label='b')
-    plt.bar(x + 2 * width, c, width=width, label='c')
-    plt.legend()
-    plt.show()
+    # size = 3
+    # total_width, n = 0.8, 3
+    # width = total_width / n
+    # x = np.arange(size)
+    # x = x - (total_width - width) / 2
+    # a = [lg_rate, rf_rate, xg_rate]
+    # b = [lg_rmse, rf_rmse, xg_rmse]
+    # c = [lg_total, rf_total, xg_total]
+    # plt.bar(x, a,  width=width, label='a')
+    # plt.bar(x + width, b, width=width, label='b')
+    # plt.bar(x + 2 * width, c, width=width, label='c')
+    # plt.legend()
+    # plt.show()
 
 if __name__ == '__main__':
     
-    # data_preprocessing()
+    data_preprocessing()
     # load_data()
 
     train()

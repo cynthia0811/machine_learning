@@ -163,7 +163,10 @@ def feature_selection():
 
     # 任务参数
 
-    #     objective：reg:linear线性回归、reg:logistic逻辑回归、binary:logistic逻辑回归处理二分类（输出概率）、binary:logitraw逻辑回归处理二分类（输出分数）、count:poisson泊松回归处理计算数据（输出均值、max_delta_step参数默认为0.7）、multi:softmax多分类（需要设定类别的个数num_class）、multi:softprob多分类（与左侧的一样，只是它的输出是ndata*nclass，也就是输出输入各类的概率）、rank:pairwise处理排位问题、reg:gamma用γ回归（返回均值）、reg:tweedie用特威迪回归。
+    #     objective：reg:linear线性回归、reg:logistic逻辑回归、binary:logistic逻辑回归处理二分类（输出概率）、
+    #     binary:logitraw逻辑回归处理二分类（输出分数）、count:poisson泊松回归处理计算数据（输出均值、max_delta_step参数默认为0.7）
+    #     multi:softmax多分类（需要设定类别的个数num_class）、multi:softprob多分类（与左侧的一样，只是它的输出是ndata*nclass，也就是输出输入各类的概率）
+    #     rank:pairwise处理排位问题、reg:gamma用γ回归（返回均值）、reg:tweedie用特威迪回归。
     #     base_score：初始化时，会预测各种类别的分数。# 当迭代足够多的次数，改变这个值是没有什么用的。
     #     eval_metric：评估分数的机制。# 用户可以加新评估机制进来的。主要的：rmse针对回归问题、error针对分类问题、map（Mean average precision）针对排位问题。
     #     seed：种子。# 默认为0。随机数的意思。
