@@ -8,8 +8,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import Imputer,LabelEncoder
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import GridSearchCV  
+from sklearn import cross_validation, metrics 
+from sklearn.model_selection import GridSearchCV,StratifiedKFold  
 import matplotlib.pyplot as plt
 
 
@@ -119,7 +119,7 @@ def train_randomForster():
 def train_XGBoost():
     X_train, X_test, y_train, y_test = load_data()
 
-    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
+    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=100, objective="binary:logistic",
                               silent=True,min_child_weight=6)
 
     eval_data = [(X_test, y_test)]
@@ -128,40 +128,20 @@ def train_XGBoost():
     y_pred = model.predict(X_test)
     rfc_rate, rmse = calc_accuracy(y_pred, y_test)
     total = total_survival(y_pred)
-    
+
     # XGBClassifier acc_rate：80.4469,RMS:0.4422,存活：56
     return rfc_rate, rmse, total
 
-
- 
-def train_CV_XGBoost():
-    X_train, X_test, y_train, y_test = load_data()
-
-    params = {
-        'max_depth': [4, 5, 6, 7, 8],
-        'min_child_weight': [4, 5, 6, 7, 8],
-        'learning_rate': [0.01, 0.03, 0.06, 0.08, 0.1]
-    }
-    model = xgb.XGBClassifier(max_depth=8, learning_rate=0.06, n_estimators=1000, objective="binary:logistic",
-                              min_child_weight=6)
-    gcv = GridSearchCV(estimator=model, param_grid=params, scoring='roc_auc', n_jobs=4, iid=False, cv=5,verbose=1)
-
-    gcv.fit(X_train, y_train)
-
-    print(gcv.grid_scores_)
-    print(gcv.best_params_)
-    print(gcv.best_score_)
 
     
 def calc_accuracy(y_pred, y_true):
     """
     计算精度
     """
-    acc = y_pred.ravel() == y_true.ravel()
-    acc_rate = 100 * float(acc.sum()) / y_pred.size
-    # rmse=np.sqrt(mean_squared_error(y_pred,y_true))
+    accuracy = metrics.accuracy_score(y_true, y_pred)
+    # rmse=np.sqrt(metrics.mean_squared_error(y_pred,y_true))
     rmse = np.sqrt(np.mean((y_pred - y_true)**2))
-    return acc_rate, rmse
+    return accuracy, rmse
 
 
 def total_survival(y_pred):
@@ -200,12 +180,51 @@ def train():
     # plt.legend()
     # plt.show()
 
+
+def optimized_XGBoost():
+    X_train, X_test, y_train, y_test = load_data()
+    model = xgb.XGBClassifier(max_depth=7, n_estimators=300, min_child_weight=5,
+                              colsample_bytree=0.6, subsample=0.9,reg_alpha=0.005)
+    eval_data = [(X_test, y_test)]
+    model.fit(X_train, y_train, eval_set=eval_data, early_stopping_rounds=30)
+    y_pred = model.predict(X_test)
+    acc, rmse = calc_accuracy(y_pred, y_test)
+
+    print("accuracy：{0:.2f}%".format(100*acc))
+
+
+def cv_XGBoost():
+    X_train, X_test, y_train, y_test = load_data()
+    model = xgb.XGBClassifier(max_depth=7, n_estimators=300, min_child_weight=5,
+                              colsample_bytree=0.6, subsample=0.9,reg_alpha=0.005)
+    grid_params = {
+        # 'learning_rate': np.linspace(0.01, 1, 100),
+        # 'n_estimators': list(range(100, 1001, 100)),
+        # 'max_depth': list(range(3, 15, 1)),
+        # 'min_child_weight': list(range(1, 6, 2)),
+        # 'subsample':[i/10.0 for i in range(1,10)],
+        # 'colsample_bytree':[i/10.0 for i in range(1,10)],
+        # 'gamma': [i/10.0 for i in range(0, 5)]
+        'reg_alpha':[0.001, 0.005, 0.01, 0.05,0.1,0.2,0.3,0.4,0.5,0.6]
+    }
+    gcv = GridSearchCV(estimator=model, param_grid=grid_params)
+    gcv.fit(X_train, y_train)
+
+    print(gcv.best_params_)
+    print("Accuracy:{0:.4f}%".format(100*gcv.best_score_))
+
+
+
+
 if __name__ == '__main__':
     
     # data_preprocessing()
     # load_data()
 
-    train()
+    # train()
 
-    # train_CV_XGBoost()
+    # train_XGBoostCV()
 
+    # cv_XGBoost()
+    
+    optimized_XGBoost()

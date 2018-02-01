@@ -152,6 +152,6 @@ if __name__ == '__main__':
 
     # histogram()
 
-    # d3()
+    d3()
 
     # dynamic()
