@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 import math
+
+
 # 数据集，只包含两列
 test_list = [[1, 5.56], [2, 5.7], [3, 5.81], [4, 6.4], [
     5, 6.8], [6, 7.05], [7, 7.9], [8, 8.7], [9, 9], [10, 9.05]]
@@ -10,18 +12,6 @@ init = 1.5
 max_times = 10
 # 允许的最大误差
 threshold = 1.0e-3
-
-
-def train_loss(t_list):
-    sum = 0
-    for fea in t_list:
-        sum += fea[1]
-    avg = sum * 1.0 / len(t_list)
-    sum_pow = 0
-    for fea in t_list:
-        sum_pow = math.pow((fea[1]-avg), 2)
-    return sum_pow, avg
-
 
 def train_loss(t_list):
     sum = 0
@@ -50,6 +40,8 @@ def boosting(data_list):
         split_num += step
     return ret_dict
 
+
+
 def main():
     
     ret_list = []
@@ -62,6 +54,7 @@ def main():
         ret_dict = boosting(data_list)
         t_list = sorted(ret_dict.items(), key=lambda x:x[1][1])
         print('split node:',t_list[0])
+
         ret_list.append([t_list[0][0], t_list[0][1][1]])
         if ret_list[-1][1] < threshold or time_num > max_times:
             break
@@ -71,6 +64,7 @@ def main():
             else:
                 data[1] -= t_list[0][1][3]
         print('after split:',data_list)
+
     print('split node and loss:')
     print('\n'.join(["%s\t%s" %(str(data[0]), str(data[1])) for data in ret_list]))
 
