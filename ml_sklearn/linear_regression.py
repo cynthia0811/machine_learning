@@ -282,6 +282,31 @@ def show_scatter(X_test,y_test,y_pred):
     plt.show()
 
 
+
+def diabetes_reg():
+    
+    diabetes = datasets.load_diabetes()
+    diabetes_X = diabetes.data[:, np.newaxis, 2]
+    diabetes_X_train = diabetes_X[:-20]
+    diabetes_X_test = diabetes_X[-20:]
+    diabetes_y_train = diabetes.target[:-20]
+    diabetes_y_test = diabetes.target[-20:]
+
+    regr = linear_model.LinearRegression()
+    regr.fit(diabetes_X_train, diabetes_y_train)
+    print('Input Values')
+    print(diabetes_X_test)
+
+    diabetes_y_pred = regr.predict(diabetes_X_test)
+    print("Predicted Output Values")
+    print(diabetes_y_pred)
+
+    plt.scatter(diabetes_X_test, diabetes_y_test, color='black')
+    plt.plot(diabetes_X_test, diabetes_y_pred, color='red', linewidth=1)
+
+    plt.show()
+
+
 if __name__ == '__main__':
     # main()
     # run()
@@ -292,20 +317,5 @@ if __name__ == '__main__':
     # lasso_reg()
     # loss_example()
     # multiTaskLasso_reg()
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    # 绘制普通图像
-    x = np.linspace(-1, 1, 50)
-    y1 = 2 * x + 1
-    y2 = x**2
-
-    plt.figure()
-    # 在绘制时设置lable, 逗号是必须的
-    l1, = plt.plot(x, y1, label = 'line')
-    l2, = plt.plot(x, y2, label = 'parabola', color = 'red', linewidth = 1.0, linestyle = '--')
-
-    # 设置legend
-    plt.legend(handles = [l1, l2,], labels = ['a', 'b'], loc = 'upper left')
-
-    plt.show()
+    
+    diabetes_reg()
