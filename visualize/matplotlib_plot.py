@@ -152,9 +152,9 @@ def brokenline():
 
 if __name__ == '__main__':
 
-    # sincos()
+    sincos()
     # linearplo()
     # scatterplot()
     # Ax3D()
     # Ax3DSq()
-    brokenline()
+    # brokenline()

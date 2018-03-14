@@ -156,10 +156,10 @@ def draw_normal():
 
     plt.figure()
     # 在绘制时设置lable, 逗号是必须的
-    l1, = plt.plot(x, y1, label='line')
-    l2, = plt.plot(x, y2, label='parabola', color='red',
-                   linewidth=1.0, linestyle='--')
-
+    l1, = plt.plot(x, y1)
+    l2, = plt.plot(x, y2, color='red',linewidth=1.0, linestyle='--')
+    plt.xlabel('x axis')
+    plt.ylabel('y axis')
     # 设置legend
     plt.legend(handles=[l1, l2, ], labels=['a', 'b'], loc='upper left')
 
@@ -171,6 +171,8 @@ if __name__ == '__main__':
 
     # histogram()
 
-    d3()
+    # d3()
+
+    draw_normal()
 
     # dynamic()
