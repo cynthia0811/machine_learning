@@ -26,6 +26,27 @@ class Vector(object):
         return Vector(self.x*scalar, self.y*scalar)
 
 
+def cartesian_product():
+    """
+    使用列表推导计算笛卡儿积 
+    """
+    colors = ["black", "white"]
+    sizes = ["S", "M", "L"]
+    tshirts = [(colors, size) for color in colors for size in sizes]
+
+    print(tshirts)
+    # 排序
+    for color in colors:
+        for size in sizes: 
+            print((color, size)) 
+
+
+    tshirts = [(color, size) for size in sizes for color in colors]
+    print("")
+    print(tshirts)
+
+
+
 def main():
     v = Vector(x=1, y=2)
     r0 = v.__repr__()
@@ -37,4 +58,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+
+    cartesian_product()

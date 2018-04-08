@@ -166,13 +166,100 @@ def draw_normal():
     plt.show()
 
 
+def linaer():
+    # data = np.arange(100, 201)
+    # plt.plot(data)
+    # plt.show()
+
+    # data = np.arange(100, 201)
+    # plt.plot(data)
+
+    # data2 = np.arange(200, 301)
+    # plt.figure()
+    # plt.plot(data2)
+    # plt.show()
+
+    # plot函数的第一个数组是横轴的值，第二个数组是纵轴的值，所以它们一个是直线，一个是折线；
+    # data = np.arange(100, 201)
+    # plt.subplot(2, 1, 1)
+    # plt.plot(data)
+
+    # data2 = np.arange(200, 301)
+    # plt.subplot(2, 1, 2)
+    # plt.plot(data2)
+
+    # plt.show()
+
+    # 参数c表示点的颜色，s是点的大小，alpha是透明度
+    N = 20
+    plt.scatter(np.random.rand(N) * 100, np.random.rand(N)* 100, c='r', s=100, alpha=0.5)
+    plt.scatter(np.random.rand(N) * 100, np.random.rand(N)* 100, c='g', s=200, alpha=0.5)
+    plt.scatter(np.random.rand(N) * 100, np.random.rand(N)* 100, c='b', s=300, alpha=0.5)
+    plt.show()
+
+
+def pie():
+    """
+    饼图  显示两个图
+    """
+    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    data = np.random.rand(7)*100
+
+    # plt.subplot(2, 1, 1)  # 2行1列subplot中的第1个subplot。
+
+    plt.subplot(1, 2, 1)
+    plt.pie(data, labels=labels, autopct='%1.1f%%')
+    plt.axis("equal")
+    plt.legend()
+
+    data1 = np.random.rand(7)*100
+    plt.subplot(1, 2, 2)
+    # autopct指定了数值的精度格式
+    plt.pie(data1, labels=labels, autopct='%1.1f%%')   
+    plt.axis("equal")
+    plt.legend()
+
+    plt.show()
+
+
+def bar():
+    """
+    条形图
+    """
+    # np.random.rand(N * 3).reshape(N, -1)表示先生成21（N x 3）个随机数，然后将它们组装成7行，那么每行就是三个数，这对应了颜色的三个组成部分。
+    N = 7
+    x = np.arange(N)
+    data = np.random.randint(low=0, high=100, size=N)
+    colors = np.random.rand(N * 3).reshape(N, -1)
+    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+    plt.title("Weekday Data")
+    plt.bar(x, data, alpha=0.8, color=colors, tick_label=labels)
+    plt.show()
+
+
+def hist():
+    """
+    直方图
+    """
+    # 生成了包含了三个数组的数组
+    data = [np.random.randint(0, n, n) for n in [3000, 4000, 5000]]
+    labels = ['3K', '4K', '5K']
+    # bins数组用来指定我们显示的直方图的边界，即：[0, 100) 会有一个数据点，[100, 500)会有一个数据点
+    bins = [0, 100, 500, 1000, 2000, 3000, 4000, 5000]
+    plt.hist(data, bins=bins, label=labels)
+    plt.legend()
+
+    plt.show()
+
+
 if __name__ == '__main__':
+    # linaer()
     # d2()
-
     # histogram()
-
     # d3()
-
-    draw_normal()
-
+    # draw_normal()
     # dynamic()
+    # pie()
+    # bar()
+    hist()
