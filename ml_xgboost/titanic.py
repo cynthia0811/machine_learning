@@ -1,16 +1,16 @@
 # -*- coding:utf-8 -*-
-import numpy as np 
-import pandas as pd 
-import xgboost as xgb 
 import math
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import Imputer,LabelEncoder
-from sklearn import cross_validation, metrics 
-from sklearn.model_selection import GridSearchCV,StratifiedKFold  
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import xgboost as xgb
+from sklearn import cross_validation, metrics
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import (GridSearchCV, StratifiedKFold,
+                                     train_test_split)
+from sklearn.preprocessing import Imputer, LabelEncoder
 
 
 def data_preprocessing():
