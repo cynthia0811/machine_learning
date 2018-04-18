@@ -94,5 +94,14 @@ def matrix_main():
             print(user_list[i*per_thread:per_thread*(i+1)])
 
 
+def slic():
+    arr= np.arange(12).reshape([3,4])
+    print(arr,end="\n\n")
+    print(arr[0::2,1:],end="\n\n")   # 每个维度可以使用步长跳跃切片
+    print(arr[0::2,0::2])            # 多维数组取步长要用冒号
+
+
 if __name__ == '__main__':
-    matrix_main()
+    # matrix_main()
+
+    sile()
