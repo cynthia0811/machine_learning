@@ -25,10 +25,12 @@ def call():
     return add
 
 
-print('程序运行。。。')
+if __name__ == '__main__':
 
-worker = WorkerThread(target=call)
-worker.start()
-result = worker.join()
+    print('程序运行。。。')
 
-print('程序结束:',result)
+    worker = WorkerThread(target=call)
+    worker.start()
+    result = worker.join()
+
+    print('程序结束:',result)
