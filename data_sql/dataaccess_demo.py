@@ -21,13 +21,13 @@ class order_da:
         :param list: 
         :return: 
         '''
-        insertsql = "INSERT IPP3.dbo.Product (SOSysNo,UserId,Name) "
+        insertsql = "INSERT XXX"
         if list:
             for order in list:
                 if insertsql.find("VALUES") > 0:
-                    insertsql += ",(%s,%s,'%s')" % (order[0], order[2], order[3])
+                    insertsql += "XX"
                 else:
-                    insertsql += "VALUES (%s,%s,%s)" % (order[0], order[2], order[3])
+                    insertsql += "XX"
         return insertsql
 
     def query_user(self):
@@ -35,9 +35,8 @@ class order_da:
         查询下过单用户
         :return: 
         '''
-        sql = "SELECT DISTINCT CustomerSysNo FROM IPP3.dbo.SO_Master WITH(NOLOCK)"
+        sql = ""
         user_list = self.msdb.execQuery(sql)
-
         return user_list
 
     def query_list(self):
@@ -46,12 +45,7 @@ class order_da:
         :param db: 
         :return: 
         '''
-        sql = "SELECT top 10 m.Status,m.CustomerSysNo, item.ProductSysNo,item.Quantity FROM  IPP3.dbo.SO_Master m WITH ( NOLOCK ) " \
-              "INNER JOIN IPP3.dbo.SO_CheckShipping c WITH(NOLOCK) ON c.SOSysNo=m.SysNo " \
-              "LEFT JOIN IPP3.dbo.SO_Item item WITH(NOLOCK) ON item.SOSysNo = m.SysNo " \
-              "LEFT JOIN IPP3.dbo.Product p  WITH(NOLOCK) ON p.SysNo=item.ProductSysNo " \
-              "WHERE c.IsPhoneOrder NOT IN(5,15) AND item.ProductType <>3"
-
+        sql = ""
         order_list = self.msdb.execQuery(sql)
         return order_list
 
@@ -61,15 +55,7 @@ class order_da:
         :param db: 
         :return: 
         '''
-        sql = "SELECT MAX(plv.custom_var_v1),MAX(plv.user_id),MAX(plv.idsite),pla.`name`,COUNT(pla.idaction) FROM piwik_log_visit plv " \
-              "LEFT JOIN piwik_log_link_visit_action pllva ON pllva.idvisit=plv.idvisit " \
-              "LEFT JOIN piwik_log_action pla on pla.idaction=pllva.idaction_url_ref " \
-              "where pllva.idsite IN (SELECT idsite FROM piwik_site WHERE idsite NOT IN (1)) " \
-              "AND (plv.custom_var_v1 is not null or plv.user_id is not null ) AND plv.custom_var_v1 >0 " \
-              "AND pla.name like '%/product/%' AND pla.`name` NOT LIKE '%pre%' AND pla.`name` NOT LIKE '%arrivenotice%' " \
-              "AND pla.`name` NOT LIKE '%/searchinstore/%' AND pla.`name` NOT LIKE '%/searchresult?%' " \
-              "GROUP BY pla.`name`  LIMIT 10"
-
+        sql = ""
         visit_log = self.mysqldb.execQuery(sql)
         return visit_log
 
